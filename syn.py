@@ -15,7 +15,9 @@ import argparse
 import copy
 import numpy as np
 import os
+import shutil
 
+import cli_syn
 import multi
 import audit_orders
 import election_spec
@@ -25,7 +27,7 @@ import reported
 import syn1
 import syn2
 import utils
-import write_csv
+import csv_writers
 
 class Syn_Params(object):
     """ An object we can hang synthesis generation parameters off of. """
@@ -98,64 +100,10 @@ def generate_segments(e, syn, low, high):
     return L
 
 
-##############################################################################
-# Command-line arguments
-
-def parse_args():
-
-    parser = argparse.ArgumentParser(description=\
-                                     ("syn.py: "
-                                      "Generates synthetic elections for "
-                                      "multi.py, a Bayesian post-election "
-                                      "audit program for an election with "
-                                      "multiple contests and multiple paper "
-                                      "ballot collections."))
-
-    # Mandatory argument: dirname
-
-    parser.add_argument("election_dirname",
-                        help=('The name of a subdirectory within the elections '
-                              'root directory, where the output of this program '
-                              'will be placed.  '
-                              'A parameter value of "" gets the default '
-                              'of TestElection followed by datetime.  '
-                              'A file with name foo.csv within subdirectory syn2_specs '
-                              'gives the synthetic election specification for '
-                              'syn_type 2, where foo is the election_dirname.  '))
-
-    # All others are optional
-
-    parser.add_argument("--syn_type",
-                        help="Type of synthetic election. (1 or 2)",
-                        default='1')
-
-    args = parser.parse_args()
-    return args
-
-
-
-
-def process_args(e, args):
-
-    e.election_dirname = ids.filename_safe(args.election_dirname)
-    e.election_name = e.election_dirname
-
-    if args.syn_type == '1':                        
-        syn1.generate_syn_type_1(e, args)
-    elif args.syn_type == '2':
-        syn2.generate_syn_type_2(e, args)
-    else:
-        print("Illegal syn_type:", args.syn_type)
-
 
 if __name__=="__main__":
 
     e = multi.Election()
-
-    args = parse_args()
-    process_args(e, args)
-
-    filepath = os.path.join(multi.ELECTIONS_ROOT, e.election_dirname)
-    print("  Done. Synthetic election written to:", filepath)
-
+    args = cli_syn.parse_args()
+    cli_syn.dispatch(e, args)
 

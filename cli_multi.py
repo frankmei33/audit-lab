@@ -1,6 +1,6 @@
-# cli.py
-# Ronald L. Rivest (with Karim Husayn Karimi)
-# July 22, 2017
+# cli_multi.py
+# Ronald L. Rivest
+# July 22, 2017 (rev. September 21, 2017)
 # python3
 
 """
@@ -68,18 +68,22 @@ def parse_args():
                         action="store_true",
                         help="Run audit based on current info.")
 
+    parser.add_argument("--pause",
+                        action="store_true",
+                        help="Pause after each audit stage to obtain confirmation before proceedings.")
+
     args = parser.parse_args()
     # print("Command line arguments:", args)
     return args
 
 
-def process_args(e, args):
+def dispatch(e, args):
 
     e.election_dirname = ids.filename_safe(args.election_dirname)
 
     e.election_name = args.election_name
 
-    ELECTIONS_ROOT = args.elections_root
+    multi.ELECTIONS_ROOT = args.elections_root
 
     if args.set_audit_seed != None:
         audit.set_audit_seed(e, args.set_audit_seed)

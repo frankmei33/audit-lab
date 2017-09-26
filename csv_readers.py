@@ -35,7 +35,7 @@ Example: (varlen csv file)
 becomes:
     [ {'A':'1', 'B':'2', 'C':('3',)},
       {'A':'4', 'B':'5', 'C':()},
-      {'A':'6', 'B':'5', 'C':(8,9)},
+      {'A':'6', 'B':'7', 'C':('8','9')},
     ]
 """
 
@@ -56,13 +56,13 @@ def read_csv_file(filename, required_fieldnames=None, varlen=False):
         rows = [row for row in reader]
         fieldnames = rows[0]
         rows = rows[1:]
-        
+
         # gather, clean, and trim field names, eliminating blanks
         fieldnames = [ids.clean_id(fieldname) for fieldname in fieldnames]
         while len(fieldnames)>0 and fieldnames[-1]=='':
             fieldnames.pop()
         if len(set(fieldnames)) != len(fieldnames):
-            utils.myerror("Duplicate field name:"+fieldnames)
+            utils.myerror("Duplicate field name:"+str(fieldnames))
 
         # data rows
         row_dicts = []
@@ -102,23 +102,5 @@ def read_csv_file(filename, required_fieldnames=None, varlen=False):
                 utils.mywarning("File {} has extra fieldnames (ignored): {}"
                                 .format(filename, extra_fieldnames))
         return row_dicts
-
-
-if __name__=="__main__":
-
-    filename = "test_data/csv_readers_test_reg.csv"
-    print("Regular (non-varlen) csv file:", filename)
-    for row in read_csv_file(filename):
-        for fieldname in sorted(row):
-            print("{}:'{}' ".format(fieldname, row[fieldname]), end='')
-        print()
-
-    filename = "test_data/csv_readers_test_varlen.csv"
-    print("Varlen csv file:", filename)
-    for row in read_csv_file(filename, varlen=True):
-        for fieldname in sorted(row):
-            print("{}:'{}' ".format(fieldname, row[fieldname]), end='')
-        print()
-
 
     

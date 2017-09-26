@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/evanlimanto/audit-lab.svg?branch=master)](https://travis-ci.org/evanlimanto/audit-lab)
+[![Coverage Status](https://coveralls.io/repos/evanlimanto/audit-lab/badge.png)](https://coveralls.io/github/evanlimanto/audit-lab)
+
 Note: This repo "audit-lab" was created initially 2017-09-04
 as a copy of
 www.github.com/ron-rivest/2017-bayes-audit/2017-code
@@ -1638,6 +1641,7 @@ Here we assume the election data is in the directory
 | ``python3 multi.py --make_audit orders CO-2017-11`` | Produces initial audit order files  |
 | ``python3 multi.py --read_audited CO-2017-11``      | Reads and checks audited votes      |
 | ``python3 multi.py --audit CO-2017-11``             | Runs audit                          |
+| ``python3 multi.py --audit --pause CO-2017-11``     | Runs audit, pausing after each stage |
 
 You can also run
 
