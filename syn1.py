@@ -14,6 +14,7 @@ synpar is an object of type syn.Syn_Parameters
 """
 
 import copy
+import logging
 import numpy as np
 
 import audit_orders
@@ -23,6 +24,9 @@ import reported
 import syn
 import utils
 import csv_writers
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 """
@@ -152,9 +156,9 @@ def generate_election_spec_contests(e, synpar):
             for selid in e.selids_c[cid]:
                 utils.nested_set(e.votes_c, [cid, (selid,)], True)
         else:
-            utils.myerror(("Contest {} is not plurality---"
-                           "Can't generate votes for it.")
-                          .format(cid))
+            raise ValueError(("Contest {} is not plurality---"
+                              "Can't generate votes for it.")
+                              .format(cid))
 
 
 def generate_election_spec_contest_groups(e, synpar):
@@ -447,8 +451,8 @@ def generate_syn_type_1(e, args):
     debug = False
     if debug:
         for key in sorted(vars(e)):
-            print(key)
-            print("    ", vars(e)[key])
+            logger.info(key)
+            logger.info("    ", vars(e)[key])
     
     csv_writers.write_csv(e)
 

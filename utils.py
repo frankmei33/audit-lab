@@ -9,9 +9,13 @@ Various utilities.
 """
 
 import datetime
+import logging
 import numpy as np
 import os
 import sys
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 ##############################################################################
 # datetime
@@ -39,54 +43,6 @@ def date_string():
 
 # Global variable for other modules to reference
 start_datetime_string = datetime_string()
-
-
-##############################################################################
-# myprint  (like logging, maybe, but maybe simpler)
-##############################################################################
-
-myprint_files = {"stdout": sys.stdout}
-
-def myprint(*args, **kwargs):
-    """ variant print statement; prints to all files in myprint_files. """
-
-    for output_file_name in myprint_files:
-        kwargs["file"] = myprint_files[output_file_name]
-        print(*args, **kwargs)
-
-
-def close_myprint_files():
-    """ Close myprint files other than stdout and stderr. """
-
-    for output_file_name in myprint_files:
-        if output_file_name not in ["stdout", "stderr"]:
-            myprint_files[output_file_name].close()
-            del myprint_files[output_file_name]
-
-
-# error and warning messages
-
-
-def myerror(msg):
-    """ Print error message and halt immediately """
-
-    print("FATAL ERROR:", msg)
-    quit()
-
-
-warnings_given = 0
-
-
-def mywarning(msg):
-    """ Print error message, but keep going.
-        Keep track of how many warnings have been given.
-    """
-
-    global warnings_given
-    # kill counter for now; it causes some problems with nosetests
-    # and in any case we'll be moving over to warnings.warn instead of mywarning.
-    # warnings_given += 1
-    print("WARNING:", msg)
 
 
 ##############################################################################
@@ -140,13 +96,13 @@ def greatest_name(dirpath,
             selected_filename = filename
     if selected_filename == "":
         if dir_wanted == False:
-            myerror(("No files in `{}` have a name starting with `{}`"
-                     "and ending with `{}`.")
-                    .format(dirpath, startswith, endswith))
+            raise FileNotFoundError(("No files in `{}` have a name starting with `{}`"
+                                     "and ending with `{}`.")
+                                     .format(dirpath, startswith, endswith))
         else:
-            myerror (("No directories in `{}` have a name starting with `{}`"
-                      "and ending with `{}`.")
-                     .format(dirpath, startswith, endswith))
+            raise FileNotFoundError(("No directories in `{}` have a name starting with `{}`"
+                                     "and ending with `{}`.")
+                                     .format(dirpath, startswith, endswith))
     return selected_filename
 
 
@@ -196,8 +152,8 @@ def count_on(start, num):
 def test_count_on():
 
     for start, num in [(1,3), ("x", 3), ("A-98", 3), ("y", 1)]:
-        print(start, num, end=" ==> ")
-        print(count_on(start, num))
+        logger.info(start, num, end=" ==> ")
+        logger.info(count_on(start, num))
     """
     1 3 ==> [1, 2, 3]
     x 3 ==> ['x1', 'x2', 'x3']
@@ -223,14 +179,11 @@ def convert_int_to_32_bit_numpy_array(v):
     Example: input 2**64 + 5 yields np.array([5, 0, 1], dtype=int)
     """
 
-    try:
-        v = int(v)
-        if v<0:
-            raise ValueError
-    except ValueError:
-        myerror(("convert_int_to_32_bit_numpy_array: "
-                 "{} is not a nonnegative integer, "
-                 "or convertible to one.").format(v))
+    v = int(v)
+    if v<0:
+        raise ValueError(("convert_int_to_32_bit_numpy_array: "
+                          "{} is not a nonnegative integer, "
+                          "or convertible to one.").format(v))
     v_parts = []
     radix = 2**32
     while v>0:
@@ -238,7 +191,7 @@ def convert_int_to_32_bit_numpy_array(v):
         v = v // radix
     # note: v_parts will be empty list if v==0, that is OK
     return np.array(v_parts, dtype=int)
-        
+
 
 def RandomState(seed):
     """
@@ -264,7 +217,7 @@ def RandomState(seed):
         seed_as_array = convert_int_to_32_bit_numpy_array(seed)
         return np.random.RandomState(seed_as_array)
     else:
-        print("utils.RandomState: seed is None!")
+        logger.info("utils.RandomState: seed is None!")
         return np.random.RandomState(seed)
 
 
